@@ -1,6 +1,6 @@
 # VRCSCMV (VRChat ScreenShot Mover)
 ----------------------------------------------------------
-ver.1.2.0.0
+ver.1.2.0.0  
 高槻かずさ(kazusap@gmail.com)
 
 ## 概要
