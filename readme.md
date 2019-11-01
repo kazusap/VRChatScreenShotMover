@@ -1,4 +1,5 @@
-# VRCSCMV (VRChat ScreenShot Mover) ver.1.2.0.0	高槻かずさ
+# VRCSCMV (VRChat ScreenShot Mover)
+ver.1.2.0.0	高槻かずさ
 ----------------------------------------------------------
 
 ## 概要
