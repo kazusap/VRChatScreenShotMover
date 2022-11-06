@@ -16,6 +16,8 @@ namespace VRCSCMV
         static void Main(string[] args)
         {
             //VRChat_1920x1080_2019-09-27_01-30-32.838.png
+
+            //VRChat_2022-09-10_00-27-20.675_1920x1080.png
             // 引数の数チェック
             Debug.WriteLine(args.Length.ToString());
             if (args.Length != 3)
@@ -40,12 +42,14 @@ namespace VRCSCMV
                 #endregion
             }
 
+            // 引数0 = プログラムファイル名
             // 引数1 = VRChatスクリーンショットフォルダ
             // 引数2 = 移動先フォルダ（この下に日付フォルダを作成して移動）
             // 引数3 = 前日扱いとする（6にすると06:00までは前日と認識）
             Debug.WriteLine("args[0]:" + args[0]);
             Debug.WriteLine("args[1]:" + args[1]);
             Debug.WriteLine("args[2]:" + args[2]);
+            //Debug.WriteLine("args[3]:" + args[3]);
 
             // VRChatスクリーンショットフォルダ
             string strFolder = args[0];
@@ -64,6 +68,10 @@ namespace VRCSCMV
                 Console.WriteLine("ERROR:時間は[0～23]にしてね。");
                 return;
             }
+
+            // サブディレクトリ一覧を取得
+//            IEnumerable<string> dirs = System.IO.Directory.EnumerateDirectories(strFolder);
+
 
             // スクリーンショットのファイル一覧を取得(PNG)
             IEnumerable<string> files = System.IO.Directory.EnumerateFiles(strFolder, "*.PNG", System.IO.SearchOption.AllDirectories);
@@ -85,8 +93,11 @@ namespace VRCSCMV
                     // ファイル名分割
                     string[] subname = fname.Split('_');
 
-                    // 日時文字列取得
-                    string strDatetime = subname[2].Replace('-', '/') + ' ' + subname[3].Replace('-', ':');
+                    // 0        1            2              3
+                    // [VRChat]_[2022-09-10]_[00-27-20.675]_[1920x1080.png]
+
+                    // 日時文字列取得    YYYY-MM-DD                           HH-MI-HH.FFF
+                    string strDatetime = subname[1].Replace('-', '/') + ' ' + subname[2].Replace('-', ':');
 
                     // 日時クラスに変換
                     DateTime dt = DateTime.Parse(strDatetime);
@@ -101,16 +112,32 @@ namespace VRCSCMV
                     string strDestPath = strDestFolder + @"\" + strFoderDate;
                     System.IO.Directory.CreateDirectory(strDestPath);
 
+                    Console.Write("makeJPEG/");
                     //JPGを新規作成
                     string jpgpath = ConvertToJpeg(fullpath, 100);
 
-                    //Exifに撮影日を付加
-                    AddExifData(jpgpath, jpgpath, dt);
+                    bool flg = false;
+                    while (!flg)
+                    {
+                        try
+                        {
+                            Console.Write("AddExif/");
+                            //Exifに撮影日を付加
+                            AddExifData(jpgpath, jpgpath, dt);
+                            flg = true;
+                        }
+                        catch (IOException ex)
+                        {
+                            System.Threading.Thread.Sleep(100);
+                        }
+                    }
 
+                    Console.Write("Move/");
                     //ファイル(JPG)を移動
                     string strDestFilePath = strDestPath + @"\" + System.IO.Path.GetFileName(jpgpath);
                     System.IO.File.Move(jpgpath, strDestFilePath);
 
+                    Console.Write("DeleteOrigin/ ");
                     //元ファイル(PNG)を削除
                     System.IO.File.Delete(fullpath);
 
